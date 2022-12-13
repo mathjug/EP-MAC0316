@@ -1,3 +1,5 @@
+{-# LANGUAGE BangPatterns #-}
+
 module Parser where
 
 import Text.Read (readMaybe)
@@ -78,24 +80,30 @@ analyze tree = case tree of
       case readMaybe token of
         Just num -> NumS num
         Nothing -> error ("ERRO analyze: número inválido: " ++ token)
-    | isSymbol token -> IdS token -- DEVO ALTERAR AQUI?
+    | isSymbol token -> if (validID token) then IdS token else error "ERRO analyze: identificador inválido!"
     | otherwise -> error "ERRO analyze: token inválido"
   Pair first rest -> case first of
     Leaf "+" -> PlusS (analyzePos 1) (analyzePos 2)
     Leaf "*" -> MultS (analyzePos 1) (analyzePos 2)
     Leaf "-" -> BMinusS (analyzePos 1) (analyzePos 2)
     Leaf "~" -> UMinusS (analyzePos 1)
-    Leaf "lambda" -> LamS (getSymbol 1) (analyzePos 2)
+    Leaf "lambda" ->
+      let !id = getSymbol 1
+      in LamS id (analyzePos 2)
     Leaf "call" -> AppS (analyzePos 1) (analyzePos 2)
     Leaf "if"   -> IfS (analyzePos 1) (analyzePos 2) (analyzePos 3)
     Leaf "cons" -> ConsS (analyzePos 1) (analyzePos 2)
     Leaf "head" -> HeadS (analyzePos 1)
     Leaf "tail" -> TailS (analyzePos 1)
-    Leaf "let"  -> LetS (getSymbol 1) (analyzePos 2) (analyzePos 3)
+    Leaf "let"  ->
+      let !id = (getSymbol 1)
+      in LetS id (analyzePos 2) (analyzePos 3)
     Leaf "let*" -> LetStarS (getSymbol 1) (analyzePos 2)
                             (getSymbol 3) (analyzePos 4)
                             (analyzePos 5)
-    Leaf "letrec" -> LetrecS (getSymbol 1) (analyzePos 2) (analyzePos 3)
+    Leaf "letrec" ->
+      let !id = (getSymbol 1)
+      in LetrecS id (analyzePos 2) (analyzePos 3)
     Leaf "quote"  -> QuoteS (show (tree `index` 1))
     _ -> error ("ERRO analyze: elemento da parse tree inesperado (" ++ show first ++ ")")
     where
@@ -105,7 +113,7 @@ analyze tree = case tree of
       -- | Função auxiliar que retorna o símbolo encontrado na posição `i` da árvore.
       getSymbol :: Int -> String
       getSymbol i = case tree `index` i of
-        Leaf symbol -> if (validID symbol) then symbol else error "ERRO analyze: identificador inválido!" -- ALTERADO AQUI
+        Leaf symbol -> if (validID symbol) then symbol else error "ERRO analyze: identificador inválido!"
         _ -> error "ERRO analyze: símbolo esperado no lugar de uma expressão"
 
 -- | Função auxiliar de `analyze` para indexação na `ParseTree`.
