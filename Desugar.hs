@@ -27,6 +27,11 @@ import Types (ExprS (..), ExprC (..))
 -- código a esta função.
 desugar :: ExprS -> ExprC
 desugar expr = case expr of
+  
+  -- ----------------------------------------------------------------
+  CaseS e1 e2 e3 e4 -> CaseC (desugar e1) (desugar e3) (desugar e4)
+  -- ----------------------------------------------------------------
+
   NumS  num      -> NumC num
   IdS   sym      -> IdC sym
   PlusS e1 e2    -> PlusC (desugar e1) (desugar e2)

@@ -75,6 +75,7 @@ parse tokens
 analyze :: ParseTree -> ExprS
 analyze tree = case tree of
   Null -> error "ERRO analyze: input inválido"
+
   Leaf token
     | isNumeral token ->
       case readMaybe token of
@@ -82,7 +83,14 @@ analyze tree = case tree of
         Nothing -> error ("ERRO analyze: número inválido: " ++ token)
     | isSymbol token -> if (validID token) then IdS token else error "ERRO analyze: identificador inválido!"
     | otherwise -> error "ERRO analyze: token inválido"
+
+  
   Pair first rest -> case first of
+
+    -- --------------------------------------------------------------------------------
+    Leaf "case"   -> CaseS (analyzePos 1) (analyzePos 2) (analyzePos 3) (analyzePos 4)
+    -- --------------------------------------------------------------------------------
+
     Leaf "+" -> PlusS (analyzePos 1) (analyzePos 2)
     Leaf "*" -> MultS (analyzePos 1) (analyzePos 2)
     Leaf "-" -> BMinusS (analyzePos 1) (analyzePos 2)

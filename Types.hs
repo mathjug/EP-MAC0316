@@ -109,6 +109,13 @@ data ExprS
     IfS      { condS :: ExprS,
                bodyPosS :: ExprS,
                bodyNegS :: ExprS }
+  |
+  -- ------------------------------------------------------------------------
+    CaseS      {  iElemS :: ExprS,
+                  ofStxS :: ExprS,
+                  vElemS :: ExprS,
+                  vCodeS :: ExprS }
+  -- ------------------------------------------------------------------------
   | -- | Representa a criação de um par. Em Lisp, as listas ligadas
     -- são criadas a partir de pares - este vai ser o principal objetivo
     -- de `ConsS` na linguagem definida por este interpretador.
@@ -169,6 +176,12 @@ data ExprC
     IfC     { condC :: ExprC,
               bodyPosC :: ExprC,
               bodyNegC :: ExprC }
+  | 
+  -- -----------------------------------
+    CaseC     { iElemC :: ExprC,
+                vElemC :: ExprC,
+                vCodeC :: ExprC }
+  -- -----------------------------------
   | -- | Representa a criação de um par. Em Lisp, as listas ligadas
     -- são criadas a partir de pares - este vai ser o principal objetivo
     -- de `ConsC` na linguagem definida por este interpretador.

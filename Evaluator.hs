@@ -31,6 +31,16 @@ import Env (extendEnv, lookupEnv)
 -- a partir de açúcares sintáticos).
 eval :: ExprC -> Env -> Value
 eval exp env = case exp of
+
+  -- ------------------------------------------------------------------------------
+  CaseC iElem l1 l2 ->
+    case (eval iElem env, (eval (HeadC(l1)) env), l2) of
+      (NumV i, NumV a, b) -> 
+        if i == a
+          then eval (HeadC(l2)) env
+          else eval (CaseC (MultC (NumC (-1)) iElem) (TailC(l1)) (TailC(l2))) env
+  -- ------------------------------------------------------------------------------
+
   NumC  num   -> NumV num
   IdC   sym   -> lookupEnv sym env
   PlusC e1 e2 ->
